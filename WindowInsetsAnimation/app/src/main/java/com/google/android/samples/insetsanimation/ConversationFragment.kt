@@ -93,14 +93,14 @@ class ConversationFragment : Fragment() {
                 dispatchMode = WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE
             )
         )
-        ViewCompat.setWindowInsetsAnimationCallback(
-            binding.conversationRecyclerview,
-            TranslateDeferringInsetsAnimationCallback(
-                view = binding.conversationRecyclerview,
-                persistentInsetTypes = WindowInsetsCompat.Type.systemBars(),
-                deferredInsetTypes = WindowInsetsCompat.Type.ime()
-            )
-        )
+//        ViewCompat.setWindowInsetsAnimationCallback(
+//            binding.conversationRecyclerview,
+//            TranslateDeferringInsetsAnimationCallback(
+//                view = binding.conversationRecyclerview,
+//                persistentInsetTypes = WindowInsetsCompat.Type.systemBars(),
+//                deferredInsetTypes = WindowInsetsCompat.Type.ime()
+//            )
+//        )
 
         /**
          * 2.5) We also want to make sure that our EditText is focused once the IME

@@ -19,6 +19,7 @@ package com.google.android.samples.insetsanimation
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 /**
@@ -39,7 +40,14 @@ internal class ConversationAdapter : RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        // We don't actually do any binding
+        when (getItemViewType(position)) {
+            ITEM_TYPE_MESSAGE_SELF -> {
+                holder.itemView.findViewById<TextView>(R.id.bubble_message).text = "to me $position"
+            }
+            else -> {
+                holder.itemView.findViewById<TextView>(R.id.bubble_message).text = "to you $position"
+            }
+        }
     }
 
     override fun getItemViewType(position: Int): Int {

@@ -16,6 +16,7 @@
 
 package com.google.android.samples.insetsanimation
 
+import android.util.Log
 import android.view.View
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
@@ -80,16 +81,25 @@ class RootViewDeferringInsetsCallback(
         view = v
         lastWindowInsets = windowInsets
 
-        val types = when {
-            // When the deferred flag is enabled, we only use the systemBars() insets
-            deferredInsets -> persistentInsetTypes
-            // Otherwise we handle the combination of the the systemBars() and ime() insets
-            else -> persistentInsetTypes or deferredInsetTypes
-        }
+//        val types = when {
+//            // When the deferred flag is enabled, we only use the systemBars() insets
+//            deferredInsets -> persistentInsetTypes
+//            // Otherwise we handle the combination of the the systemBars() and ime() insets
+//            else -> persistentInsetTypes or deferredInsetTypes
+//        }
+//
+//        // Finally we apply the resolved insets by setting them as padding
+//        val typeInsets = windowInsets.getInsets(types)
+//        v.setPadding(typeInsets.left, typeInsets.top, typeInsets.right, typeInsets.bottom)
 
-        // Finally we apply the resolved insets by setting them as padding
-        val typeInsets = windowInsets.getInsets(types)
-        v.setPadding(typeInsets.left, typeInsets.top, typeInsets.right, typeInsets.bottom)
+        val persistentTypeInsets = windowInsets.getInsets(persistentInsetTypes)
+        Log.d("Bob", "deferredInsets=$deferredInsets persistentTypeInsets=$persistentTypeInsets")
+        v.setPadding(
+            persistentTypeInsets.left,
+            persistentTypeInsets.top,
+            persistentTypeInsets.right,
+            persistentTypeInsets.bottom
+        )
 
         // We return the new WindowInsetsCompat.CONSUMED to stop the insets being dispatched any
         // further into the view hierarchy. This replaces the deprecated

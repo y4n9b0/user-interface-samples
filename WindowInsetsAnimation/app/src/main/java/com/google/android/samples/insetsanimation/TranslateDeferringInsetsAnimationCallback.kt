@@ -16,8 +16,10 @@
 
 package com.google.android.samples.insetsanimation
 
+import android.util.Log
 import android.view.View
 import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 
@@ -44,11 +46,28 @@ class TranslateDeferringInsetsAnimationCallback(
     val deferredInsetTypes: Int,
     dispatchMode: Int = DISPATCH_MODE_STOP
 ) : WindowInsetsAnimationCompat.Callback(dispatchMode) {
+
     init {
         require(persistentInsetTypes and deferredInsetTypes == 0) {
             "persistentInsetTypes and deferredInsetTypes can not contain any of " +
                     " same WindowInsetsCompat.Type values"
         }
+    }
+
+    private var showIme: Boolean = false
+    private var fullyShownImeHeight = 0
+    private var otherInset: Insets? = null
+
+    override fun onStart(
+        animation: WindowInsetsAnimationCompat,
+        bounds: WindowInsetsAnimationCompat.BoundsCompat
+    ): WindowInsetsAnimationCompat.BoundsCompat {
+        showIme = ViewCompat.getRootWindowInsets(view)
+            ?.isVisible(WindowInsetsCompat.Type.ime())
+            ?: false
+        fullyShownImeHeight = bounds.upperBound.bottom
+        Log.e("Bob", "showIme=$showIme fullyShownImeHeight=${fullyShownImeHeight}")
+        return super.onStart(animation, bounds)
     }
 
     override fun onProgress(
@@ -60,11 +79,11 @@ class TranslateDeferringInsetsAnimationCallback(
         // First we get the insets which are potentially deferred
         val typesInset = insets.getInsets(deferredInsetTypes)
         // Then we get the persistent inset types which are applied as padding during layout
-        val otherInset = insets.getInsets(persistentInsetTypes)
+        otherInset = insets.getInsets(persistentInsetTypes)
 
         // Now that we subtract the two insets, to calculate the difference. We also coerce
         // the insets to be >= 0, to make sure we don't use negative insets.
-        val diff = Insets.subtract(typesInset, otherInset).let {
+        val diff = Insets.subtract(typesInset, otherInset!!).let {
             Insets.max(it, Insets.NONE)
         }
 
@@ -72,13 +91,15 @@ class TranslateDeferringInsetsAnimationCallback(
         // to the view
         view.translationX = (diff.left - diff.right).toFloat()
         view.translationY = (diff.top - diff.bottom).toFloat()
+        Log.d("Bob", "typesInset=$typesInset otherInset=$otherInset tranY=${(diff.top - diff.bottom).toFloat()}")
 
         return insets
     }
 
     override fun onEnd(animation: WindowInsetsAnimationCompat) {
         // Once the animation has ended, reset the translation values
-        view.translationX = 0f
-        view.translationY = 0f
+//        view.translationX = 0f
+//        view.translationY = 0f
+        view.translationY = if (showIme) (otherInset?.bottom ?: 0) - fullyShownImeHeight.toFloat() else 0f
     }
 }
